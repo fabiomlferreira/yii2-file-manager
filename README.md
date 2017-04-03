@@ -1,6 +1,6 @@
 Yii2 file manager
 ================
-This module provide interface to collect and access all mediafiles in one place. This module have an option to enable on the fly thumbnail generation
+This module provide interface to collect and access all mediafiles in one place. This module have an option to enable on the fly thumbnail generation.
 
 Features
 ------------
