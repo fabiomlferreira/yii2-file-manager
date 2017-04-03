@@ -13,6 +13,7 @@ use yii\helpers\Inflector;
 use fabiomlferreira\filemanager\Module;
 use fabiomlferreira\filemanager\models\Owners;
 use Imagine\Image\ImageInterface;
+use Imagine\Image\Box;
 
 /**
  * This is the model class for table "filemanager_mediafile".
@@ -251,6 +252,68 @@ class Mediafile extends ActiveRecord
 
         return $this->save();
     }
+    
+    
+    /**
+     * Function to optimize a image and reduce the size to a a maximum width/height
+     * @param array $routes
+     * @param type $quality
+     * @param type $size this is the maximum size for width or height
+     * @return boolean
+     */
+    public function optimizeOriginal(array $routes, $quality, $size)
+    {
+        if($this->isImage()){
+            $basePath = Yii::getAlias($routes['basePath']);
+            $originalFile = pathinfo($this->url);
+            $dirname = $originalFile['dirname'];
+            $filename = $originalFile['filename'];
+            $extension = $originalFile['extension'];
+
+            Image::$driver = [Image::DRIVER_GD2, Image::DRIVER_GMAGICK, Image::DRIVER_IMAGICK];
+
+            $image = Image::getImagine()->open("$basePath/{$this->url}");
+            if($size === null){
+                $image->rotate($this->getOrientation("$basePath/{$this->url}"))->save("$basePath/{$this->url}", [
+                    'quality' => $quality
+                ]);
+            }else{
+                $image->rotate($this->getOrientation("$basePath/{$this->url}"))->thumbnail(new Box($size, $size))->save("$basePath/{$this->url}", [
+                    'quality' => $quality
+                ]); 
+            }
+            clearstatcache(false, "$basePath/{$this->url}"); //clear the cache for filesize work
+            $this->size = filesize("$basePath/{$this->url}");
+            return $this->save(false);
+        }else
+            return false;
+    }
+    
+    /**
+     * Return the orientation of an image
+     * @param type $filename
+     * @return int
+     */
+    private function getOrientation($filename) {
+        $exif = @exif_read_data($filename);
+        if($exif === null)
+            return 0;
+        $rotation = 0;
+        if (!empty($exif['Orientation'])) {
+            switch ($exif['Orientation']) {
+                case 3:
+                    $rotation = 180;
+                    break;
+                case 6:
+                    $rotation = 90;
+                    break;
+                case 8:
+                    $rotation = -90;
+                    break;
+            }
+        }
+        return $rotation;
+    }
 
     /**
      * Create thumbs for this image
@@ -261,34 +324,40 @@ class Mediafile extends ActiveRecord
      */
     public function createThumbs(array $routes, array $presets)
     {
-        $thumbs = [];
-        $basePath = $basePath = Yii::getAlias($routes['basePath']);
-        $originalFile = pathinfo($this->url);
-        $dirname = $originalFile['dirname'];
-        $filename = $originalFile['filename'];
-        $extension = $originalFile['extension'];
+        $module = Module::getInstance();
+        //is thumbnailOnTheFly is disable then create the thumbnails
+        if($module->thumbnailOnTheFly == false){
+            $thumbs = [];
+            $basePath = $basePath = Yii::getAlias($routes['basePath']);
+            $originalFile = pathinfo($this->url);
+            $dirname = $originalFile['dirname'];
+            $filename = $originalFile['filename'];
+            $extension = $originalFile['extension'];
 
-        Image::$driver = [Image::DRIVER_GD2, Image::DRIVER_GMAGICK, Image::DRIVER_IMAGICK];
+            Image::$driver = [Image::DRIVER_GD2, Image::DRIVER_GMAGICK, Image::DRIVER_IMAGICK];
 
-        foreach ($presets as $alias => $preset) {
-            $width = $preset['size'][0];
-            $height = $preset['size'][1];
-            $mode = (isset($preset['mode']) ? $preset['mode'] : ImageInterface::THUMBNAIL_OUTBOUND);
+            foreach ($presets as $alias => $preset) {
+                $width = $preset['size'][0];
+                $height = $preset['size'][1];
+                $mode = (isset($preset['mode']) ? $preset['mode'] : ImageInterface::THUMBNAIL_OUTBOUND);
 
-            $thumbUrl = "$dirname/" . $this->getThumbFilename($filename, $extension, $alias, $width, $height);
+                $thumbUrl = "$dirname/" . $this->getThumbFilename($filename, $extension, $alias, $width, $height);
 
-            Image::thumbnail("$basePath/{$this->url}", $width, $height, $mode)->save("$basePath/$thumbUrl");
+                Image::thumbnail("$basePath/{$this->url}", $width, $height, $mode)->save("$basePath/$thumbUrl");
 
-            $thumbs[$alias] = $thumbUrl;
+                $thumbs[$alias] = $thumbUrl;
+            }
+
+            $this->thumbs = serialize($thumbs);
+            $this->detachBehavior('timestamp');
+
+            // create default thumbnail
+            $this->createDefaultThumb($routes);
+
+            return $this->save();
+        }else{
+            return true;
         }
-
-        $this->thumbs = serialize($thumbs);
-        $this->detachBehavior('timestamp');
-
-        // create default thumbnail
-        $this->createDefaultThumb($routes);
-
-        return $this->save();
     }
 
     /**
@@ -370,15 +439,30 @@ class Mediafile extends ActiveRecord
     public function getDefaultThumbUrl($baseUrl = '')
     {
         if ($this->isImage()) {
+            $module = Module::getInstance();
             $size = Module::getDefaultThumbSize();
-            $originalFile = pathinfo($this->url);
-            $dirname = $originalFile['dirname'];
-            $filename = $originalFile['filename'];
-            $extension = $originalFile['extension'];
             $width = $size[0];
             $height = $size[1];
+            //is thumbnailOnTheFly is disable then create the thumbnails
+            if($module->thumbnailOnTheFly == false){
+                $originalFile = pathinfo($this->url);
+                $dirname = $originalFile['dirname'];
+                $filename = $originalFile['filename'];
+                $extension = $originalFile['extension'];
 
-            return "$dirname/" . $this->getThumbFilename($filename, $extension, Module::DEFAULT_THUMB_ALIAS, $width, $height);
+                return "$dirname/" . $this->getThumbFilename($filename, $extension, Module::DEFAULT_THUMB_ALIAS, $width, $height);
+            }else{
+                return Yii::$app->thumbnail->url("$this->url", [
+                    'thumbnail' => [
+                        'width' =>  $width,
+                        'height' => $height,
+                    ],
+                    'placeholder' => [
+                        'width' =>  $width,
+                        'height' => $height
+                    ]
+                ]);
+            }
         }
         return "$baseUrl/images/file.png";
     }
@@ -389,15 +473,29 @@ class Mediafile extends ActiveRecord
      */
     public function getDefaultUploadThumbUrl($baseUrl = '')
     {
+        $module = Module::getInstance();
         $size = Module::getDefaultThumbSize();
+        $width = $size[0];
+        $height = $size[1];
         $originalFile = pathinfo($this->url);
         $dirname = $originalFile['dirname'];
         $filename = $originalFile['filename'];
         $extension = $originalFile['extension'];
-        $width = $size[0];
-        $height = $size[1];
-
-        return "$dirname/" . $this->getThumbFilename($filename, $extension, Module::DEFAULT_THUMB_ALIAS, $width, $height);
+        
+        if($module->thumbnailOnTheFly == false){
+            return "$dirname/" . $this->getThumbFilename($filename, $extension, Module::DEFAULT_THUMB_ALIAS, $width, $height);
+        }else{
+            return Yii::$app->thumbnail->url("$this->url", [
+                    'thumbnail' => [
+                        'width' =>  $width,
+                        'height' => $height,
+                    ],
+                    'placeholder' => [
+                        'width' =>  $width,
+                        'height' => $height
+                    ]
+                ]);
+        }
     }
 
 	/**
@@ -439,13 +537,36 @@ class Mediafile extends ActiveRecord
      */
     public function getThumbUrl($alias)
     {
-        $thumbs = $this->getThumbs();
+        $module = Module::getInstance();
+        //if is to use the regular thumbnail generation
+        if($module->thumbnailOnTheFly == false){
+            $thumbs = $this->getThumbs();
+           
+            if ($alias === 'original') {
+                return $this->url;
+            }
 
-        if ($alias === 'original') {
-            return $this->url;
+            return !empty($thumbs[$alias]) ? $thumbs[$alias] : '';
+        }else{
+            $sizes = !empty($module->thumbs[$alias]) ? $module->thumbs[$alias] : '';
+            if($sizes == '')
+                return '';
+            
+            $width = $sizes['size'][0];
+            $height = $sizes['size'][1];
+            $mode = isset($sizes['mode']) ? $sizes['mode'] : ImageInterface::THUMBNAIL_OUTBOUND;
+            return Yii::$app->thumbnail->url("$this->url", [
+                'thumbnail' => [
+                    'width' =>  $width,
+                    'height' => $height,
+                    'mode' => $mode 
+                ],
+                'placeholder' => [
+                    'width' =>  $width,
+                    'height' => $height
+                ]
+            ]);
         }
-
-        return !empty($thumbs[$alias]) ? $thumbs[$alias] : '';
     }
 
     /**

@@ -17,7 +17,9 @@
         "pendalf89/yii2-tinymce": "*",  
         "kartik-v/yii2-widget-alert": "*",
         "kartik-v/yii2-widget-select2": "*",
-        "2amigos/yii2-file-upload-widget": "*"
+        "2amigos/yii2-file-upload-widget": "*",
+        "bower-asset/holderjs": "2.8",
+        "kinglozzer/tinypng": "0.1.*"
     },
     "autoload": {
         "psr-4": {

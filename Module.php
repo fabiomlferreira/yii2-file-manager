@@ -21,6 +21,24 @@ class Module extends \yii\base\Module
      * @var boolean
      */
     public $autoUpload = false;
+    
+    /**
+     *  Set true to enable optimization of original image
+     * @var boolean
+     */
+    public $optimizeOriginalImage = false;
+    
+    /**
+     * Maximum image quality
+     * @var integer 
+     */
+    public $originalQuality = 80;
+    
+    /**
+     * Maximum size in pixeis for a side of the image, if 0 don't change image size
+     * @var integer 
+     */
+    public $maxSideSize = null;
 
     /**
      * Thumbnails name template.
@@ -59,6 +77,13 @@ class Module extends \yii\base\Module
             'size' => [800, 600],
         ],
     ];
+    
+    /**
+     * If we instead of using multiple thumbnails create them on the fly with the
+     * size that we want
+     * @var boolean
+     */
+    public $thumbnailOnTheFly = false;
 
     /**
      * @var array default thumbnail size, using in filemanager view.

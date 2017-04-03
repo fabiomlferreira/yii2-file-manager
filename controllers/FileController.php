@@ -94,6 +94,11 @@ class FileController extends Controller
         $bundle = FilemanagerAsset::register($this->view);
 
         if ($model->isImage()) {
+            if($this->module->optimizeOriginalImage){
+                $quality = $this->module->originalQuality;
+                $maxSize = $this->module->maxSideSize;
+                $model->optimizeOriginal($routes, $quality, $maxSize);
+            }
             $model->createThumbs($routes, $this->module->thumbs);
         }
 
