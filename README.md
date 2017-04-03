@@ -131,6 +131,7 @@ If you set the 'thumbnailOnTheFly' to true you need to configure the component T
     ],
 ]
 ```
+[Read the Documentation for Thumbnail component](THUMBNAIL.md)
 
 Usage
 ------------
