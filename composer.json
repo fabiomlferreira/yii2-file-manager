@@ -1,0 +1,27 @@
+{
+    "name": "fabiomlferreira/yii2-file-manager",
+    "description": "File Manager for Yii2",
+    "keywords": ["yii2", "filemanager", "image", "upload", "file manager"],
+    "type": "yii2-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "fabiomlferreira",
+            "email": "fabiomlferreira@hotmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "yiisoft/yii2": "^2.0.0",
+        "yiisoft/yii2-imagine": "*",
+        "pendalf89/yii2-tinymce": "*",  
+        "kartik-v/yii2-widget-alert": "*",
+        "kartik-v/yii2-widget-select2": "*",
+        "2amigos/yii2-file-upload-widget": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "fabiomlferreira\\filemanager\\": ""
+        }
+    }
+}
