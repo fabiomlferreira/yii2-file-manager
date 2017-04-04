@@ -85,6 +85,8 @@ Configuration:
                 'size' => [500, 400],
             ],
         ],
+        // following line will restrict access to admin controller from frontend application
+        'as frontend' => 'fabiomlferreira\filemanager\filters\FrontendFilter',
     ],
 ],
 ```
