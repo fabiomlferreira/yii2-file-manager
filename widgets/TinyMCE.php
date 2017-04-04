@@ -8,6 +8,7 @@ use fabiomlferreira\filemanager\assets\FileInputAsset;
 use pendalf89\tinymce\TinyMce as TinyMceWidget;
 use yii\helpers\Url;
 
+
 class TinyMCE extends InputWidget
 {
     /**
