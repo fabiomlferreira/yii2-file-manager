@@ -5,10 +5,10 @@ use Yii;
 use yii\widgets\InputWidget;
 use yii\web\JsExpression;
 use fabiomlferreira\filemanager\assets\FileInputAsset;
-use fabiomlferreira\tinymce\TinyMce as TinyMceWidget;
+use pendalf89\tinymce\TinyMce as TinyMceWidget;
 use yii\helpers\Url;
 
-class TinyMce extends InputWidget
+class TinyMCE extends InputWidget
 {
     /**
      * @var string Optional, if set, only this image can be selected by user
