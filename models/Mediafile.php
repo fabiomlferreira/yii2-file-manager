@@ -34,6 +34,8 @@ use Imagine\Image\Box;
 class Mediafile extends ActiveRecord
 {
     public $file;
+    
+    public $moduleName = 'filemanager';
 
     public static $imageFileTypes = ['image/gif', 'image/jpeg', 'image/png'];
 
@@ -325,6 +327,8 @@ class Mediafile extends ActiveRecord
     public function createThumbs(array $routes, array $presets)
     {
         $module = Module::getInstance();
+        if($module===null)
+            $module = \Yii::$app->getModule($this->moduleName);
         //is thumbnailOnTheFly is disable then create the thumbnails
         if($module->thumbnailOnTheFly == false){
             $thumbs = [];
@@ -440,6 +444,8 @@ class Mediafile extends ActiveRecord
     {
         if ($this->isImage()) {
             $module = Module::getInstance();
+            if($module===null)
+                $module = \Yii::$app->getModule($this->moduleName);
             $size = Module::getDefaultThumbSize();
             $width = $size[0];
             $height = $size[1];
@@ -474,6 +480,8 @@ class Mediafile extends ActiveRecord
     public function getDefaultUploadThumbUrl($baseUrl = '')
     {
         $module = Module::getInstance();
+        if($module===null)
+            $module = \Yii::$app->getModule($this->moduleName);
         $size = Module::getDefaultThumbSize();
         $width = $size[0];
         $height = $size[1];
@@ -538,6 +546,8 @@ class Mediafile extends ActiveRecord
     public function getThumbUrl($alias)
     {
         $module = Module::getInstance();
+        if($module===null)
+            $module = \Yii::$app->getModule($this->moduleName);
         //if is to use the regular thumbnail generation
         if($module->thumbnailOnTheFly == false){
             $thumbs = $this->getThumbs();
