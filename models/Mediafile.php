@@ -347,7 +347,12 @@ class Mediafile extends ActiveRecord
 
                 $thumbUrl = "$dirname/" . $this->getThumbFilename($filename, $extension, $alias, $width, $height);
 
-                Image::thumbnail("$basePath/{$this->url}", $width, $height, $mode)->save("$basePath/$thumbUrl");
+                if(isset($preset['keepAspectRatio']) && $preset['keepAspectRatio'] == true){
+                    $image = Image::getImagine()->open("$basePath/{$this->url}");
+                    $image->thumbnail(new Box($width, $height), $mode)->save("$basePath/$thumbUrl"); 
+                }else{
+                    Image::thumbnail("$basePath/{$this->url}", $width, $height, $mode)->save("$basePath/$thumbUrl");
+                }
 
                 $thumbs[$alias] = $thumbUrl;
             }

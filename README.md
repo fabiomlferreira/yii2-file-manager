@@ -110,6 +110,27 @@ By default, thumbnails are resized in "outbound" or "fill" mode. To switch to "i
 ],
 ```
 
+If you need to keep the aspect ratio without white margins you can put the mode to INSET and also set to true the keepAspectRatio property. This will use the Box method to fix the highest side and reside the other side proportionally:
+
+```php
+'thumbs' => [
+    'small' => [
+        'name' => 'Small',
+        'size' => [100, 100],
+    ],
+    'medium' => [
+        'name' => 'Regular',
+        'size' => [300, 200],
+    ],
+    'large' => [
+        'name' => 'Large',
+        'size' => [500, 400],
+        'mode' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
+        'keepAspectRatio' => true,
+    ],
+],
+```
+
 If you set the 'thumbnailOnTheFly' to true you need to configure the component Thumbnail
 
 ```php
