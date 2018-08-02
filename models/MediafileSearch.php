@@ -3,16 +3,8 @@
 namespace fabiomlferreira\filemanager\models;
 
 use Yii;
-use yii\web\UploadedFile;
-use yii\behaviors\TimestampBehavior;
-use yii\db\ActiveRecord;
-use yii\imagine\Image;
 use yii\data\ActiveDataProvider;
-use yii\helpers\Html;
-use yii\helpers\Inflector;
-use fabiomlferreira\filemanager\Module;
-use fabiomlferreira\filemanager\models\Owners;
-use Imagine\Image\ImageInterface;
+
 
 /**
  *
