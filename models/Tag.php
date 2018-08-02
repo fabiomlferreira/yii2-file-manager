@@ -3,9 +3,8 @@
 namespace fabiomlferreira\filemanager\models;
 
 use Yii;
-
+use yii\db\ActiveRecord;
 use fabiomlferreira\filemanager\Module;
-
 
 /**
  * This is the model class for table "filemanager_tag".
