@@ -131,6 +131,26 @@ If you need to keep the aspect ratio without white margins you can put the mode 
 ],
 ```
 
+If you need to keep the aspect ratio and upscale the image to have allways se selected size, even if some parts of the image are cropped.
+
+```php
+'thumbs' => [
+    'small' => [
+        'name' => 'Small',
+        'size' => [100, 100],
+    ],
+    'medium' => [
+        'name' => 'Regular',
+        'size' => [300, 200],
+    ],
+    'large' => [
+        'name' => 'Large',
+        'size' => [500, 400],
+        'forceUpscale' => true,
+    ],
+],
+```
+
 If you set the 'thumbnailOnTheFly' to true you need to configure the component Thumbnail
 
 ```php

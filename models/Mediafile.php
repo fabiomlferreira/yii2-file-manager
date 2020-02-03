@@ -393,7 +393,11 @@ class Mediafile extends ActiveRecord
                     $image = Image::getImagine()->open("$basePath/{$this->url}");
                     $image->thumbnail(new Box($width, $height), $mode)->save("$basePath/$thumbUrl"); 
                 }else{
-                    Image::thumbnail("$basePath/{$this->url}", $width, $height, $mode)->save("$basePath/$thumbUrl");
+                    if(isset($preset['forceUpscale']) && $preset['forceUpscale'] == true){
+                        Image::thumbnail("$basePath/{$this->url}", $width, $height, $mode)->resize(new Box($width, $height))->save("$basePath/$thumbUrl");
+                    }else{
+                        Image::thumbnail("$basePath/{$this->url}", $width, $height, $mode)->save("$basePath/$thumbUrl");
+                    }
                 }
 
                 $thumbs[$alias] = $thumbUrl;
