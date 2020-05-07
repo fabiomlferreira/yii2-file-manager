@@ -389,15 +389,15 @@ class Mediafile extends ActiveRecord
 
                 $thumbUrl = "$dirname/" . $this->getThumbFilename($filename, $extension, $alias, $width, $height);
 
+                $image = new Image();
+                if(isset($preset['thumbnailBackgroundColor']))
+                    $image::$thumbnailBackgroundColor = $preset['thumbnailBackgroundColor'];
+                if(isset($preset['thumbnailBackgroundAlpha']))
+                    $image::$thumbnailBackgroundAlpha = $preset['thumbnailBackgroundAlpha'];
                 if(isset($preset['keepAspectRatio']) && $preset['keepAspectRatio'] == true){
-                    $image = Image::getImagine()->open("$basePath/{$this->url}");
+                    $image = $image::getImagine()->open("$basePath/{$this->url}");
                     $image->thumbnail(new Box($width, $height), $mode)->save("$basePath/$thumbUrl"); 
                 }else{
-                    $image = new Image();
-                    if(isset($preset['thumbnailBackgroundColor']))
-                        $image::$thumbnailBackgroundColor = $preset['thumbnailBackgroundColor'];
-                    if(isset($preset['thumbnailBackgroundAlpha']))
-                        $image::$thumbnailBackgroundAlpha = $preset['thumbnailBackgroundAlpha'];
                     if(isset($preset['forceUpscale']) && $preset['forceUpscale'] == true){
                         $image::thumbnail("$basePath/{$this->url}", $width, $height, $mode)->resize(new Box($width, $height))->save("$basePath/$thumbUrl");
                     }else{
