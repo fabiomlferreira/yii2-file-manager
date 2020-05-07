@@ -151,6 +151,28 @@ If you need to keep the aspect ratio and upscale the image to have allways se se
 ],
 ```
 
+If you need to change the color and transparency of borders in inset resizes use this.
+
+```php
+'thumbs' => [
+    'small' => [
+        'name' => 'Small',
+        'size' => [100, 100],
+    ],
+    'medium' => [
+        'name' => 'Regular',
+        'size' => [300, 200],
+    ],
+    'large' => [
+        'name' => 'Large',
+        'size' => [500, 400],
+        'mode' => \Imagine\Image\ImageInterface::THUMBNAIL_INSET,
+        'thumbnailBackgroundColor' => 'FFF',
+        'thumbnailBackgroundAlpha' => 0
+    ],
+],
+```
+
 If you set the 'thumbnailOnTheFly' to true you need to configure the component Thumbnail
 
 ```php
